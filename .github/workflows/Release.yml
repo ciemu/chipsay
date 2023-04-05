@@ -1,0 +1,67 @@
+# Copyright (c) Rodrigo Speller. All rights reserved.
+# Licensed under the MIT License. See LICENSE in the project root for license information.
+
+name: Release chipsay images
+
+on: [ push, pull_request ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  chipsay-release:
+    name: Build and push chipsay images
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup CIEmu Action emulation
+        uses: ciemu/action@v0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build images
+        run: |
+          images=(
+              amd64/alpine:3.17
+              arm32v6/alpine:3.17
+              arm32v7/alpine:3.17
+              arm64v8/alpine:3.17
+              ppc64le/alpine:3.17
+              s390x/alpine:3.17
+              riscv64/alpine:edge
+          )
+
+          for image in ${images[@]}; do
+            arch="$(cut -d '/' -f 1 <<< "$image")"
+            echo "::group::Creating '$arch' image..."
+              DOCKER_BUILDKIT=1 docker build --build-arg BASE_IMAGE="$image" -t "ghcr.io/${{github.repository}}:${arch}" .
+              docker push "ghcr.io/${{github.repository}}:${arch}"
+            echo "::endgroup::"
+          done
+
+      - name: Build multi-arch manifest
+        run: |
+          for tag in "multi-arch" "latest"; do
+            echo "::group::Creating '$tag' manifest..."
+              docker manifest create ghcr.io/${{github.repository}}:${tag} \
+                ghcr.io/${{github.repository}}:amd64 \
+                ghcr.io/${{github.repository}}:arm32v6 \
+                ghcr.io/${{github.repository}}:arm32v7 \
+                ghcr.io/${{github.repository}}:arm64v8 \
+                ghcr.io/${{github.repository}}:ppc64le \
+                ghcr.io/${{github.repository}}:s390x \
+                ghcr.io/${{github.repository}}:riscv64
+
+                echo "Pushing $tag manifest to GitHub Container Registry..."
+                docker manifest push "ghcr.io/${{github.repository}}:$tag"
+              echo "::endgroup::"
+          done
