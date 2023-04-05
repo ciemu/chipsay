@@ -5,6 +5,9 @@ ARG BASE_IMAGE=alpine:latest
 
 FROM ${BASE_IMAGE}
 
+ARG BASE_IMAGE=alpine:latest
+ENV CIEMU_BASE_IMAGE=${BASE_IMAGE}
+
 COPY --chmod=775  chipsay /usr/local/bin/chipsay
 
 CMD [ "chipsay" ]

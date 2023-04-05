@@ -3,17 +3,17 @@
 # Copyright (c) Rodrigo Speller. All rights reserved.
 # Licensed under the MIT License. See LICENSE in the project root for license information.
 
-CIEMU_IMAGE=${CIEMU_IMAGE:-"unknown"}
+CIEMU_BASE_IMAGE=${CIEMU_BASE_IMAGE:-${CIEMU_IMAGE:-"unknown"}}
 
 echo "Copyright (c) Rodrigo Speller. All rights reserved."
 echo "Licensed under the MIT License."
-echo "See LICENSE on <https://github.com/ciemu/action/blob/main/LICENSE>."
+echo "See LICENSE on <https://github.com/ciemu/chipsay/blob/main/LICENSE>."
 echo
 echo
 echo "$(echo -n '     $$ $$ $$ $$')"
 echo "$(echo -n '  .%$$$$$$$$$$$$$%.')"
-echo "$(echo -n '  $$             $$')    CIEmu Action"
-echo "$(echo -n '  D$    CIEmu    $$')    Image base: $CIEMU_IMAGE"
+echo "$(echo -n '  $$             $$')    CIEmu chipsay"
+echo "$(echo -n '  D$    CIEmu    $$')    Base image: $CIEMU_BASE_IMAGE"
 echo "$(echo -n '  $$             $$')    Machine arch: $(uname -m)"
 echo "$(echo -n '  `%$$$$$$$$$$$$$%´')"
 echo "$(echo -n '     $$ $$ $$ $$')"
